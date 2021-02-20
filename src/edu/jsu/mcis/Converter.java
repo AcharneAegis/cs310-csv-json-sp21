@@ -69,6 +69,60 @@ public class Converter {
             
             // INSERT YOUR CODE HERE
             
+            //for three main types
+            JSONArray colHeaders = new JSONArray();
+            JSONArray rowHeaders = new JSONArray();
+            JSONArray data = new JSONArray();
+            
+            
+            //for passing
+            JSONArray currentData = new JSONArray();
+            JSONObject jsonObject = new JSONObject();
+            
+            String[] record;
+            //String jsonString = "";
+            
+            record = iterator.next();
+
+            for(String thing : record){
+                colHeaders.add((String)thing);
+            }
+            
+            
+            while (iterator.hasNext()){
+                //jsonObject = new JSONObject();
+
+                record = iterator.next();
+                
+                
+                
+                currentData = new JSONArray();
+                for(int i = 0; i < record.length; i++){
+                    
+                    if (i == 0){
+                        
+                        rowHeaders.add(((String)record[0]));
+                        //System.out.println(record[0]);
+                    }
+                    else{
+                        currentData.add(Integer.parseInt(record[i]));
+                    }
+                }
+
+                data.add(currentData);
+                
+            }
+            jsonObject.put("colHeaders", colHeaders);
+            jsonObject.put("rowHeaders", rowHeaders);
+            jsonObject.put("data", data);
+            
+            
+            
+            results = jsonObject.toJSONString();
+            //System.out.println(results);
+
+            
+
         }        
         catch(Exception e) { return e.toString(); }
         
@@ -86,6 +140,63 @@ public class Converter {
             CSVWriter csvWriter = new CSVWriter(writer, ',', '"', '\n');
             
             // INSERT YOUR CODE HERE
+            
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject =(JSONObject)parser.parse(jsonString);
+            
+            
+            JSONArray colHeaders = (JSONArray)jsonObject.get("colHeaders");
+            //System.out.println(colHeaders.toString());
+            JSONArray rowHeaders = (JSONArray)jsonObject.get("rowHeaders");
+            JSONArray data = (JSONArray)jsonObject.get("data");
+            
+            
+            String[] lineOfData = new String[colHeaders.size()];
+            JSONArray transferArray;
+            
+            for(int i = 0; i < colHeaders.size(); i++){
+                lineOfData[i] = (String)colHeaders.get(i);
+            }
+            
+            csvWriter.writeNext(lineOfData);
+            
+            
+            //String[] lineOfData = new String[colHeaders.size()];
+            
+            //System.out.println(rowHeaders.size());
+            
+            
+            for(int i = 0; i < data.size(); i++){
+                
+                lineOfData = new String[colHeaders.size()];
+                //System.out.println(lineOfData.toString());
+                //arrayOfData = new String[rowHeaders.size()-1];
+                
+                
+                //csvWriter.writeNext(lineOfData);
+                
+                for(int j = 1; j < colHeaders.size(); j++){
+                    
+                    lineOfData[0] = (String)(rowHeaders.get(i));
+                    //System.out.println("ErrorCheck");
+                    transferArray = (JSONArray)data.get(i);
+                    
+                    //System.out.println(data.get(j-1));
+
+                    
+                    //System.out.println(j);
+                    lineOfData[j] = transferArray.get(j-1).toString();
+                    //System.out.println("ErrorCheck");
+                    //System.out.println(j);
+                    //System.out.println(i);
+                }
+                
+                csvWriter.writeNext(lineOfData);
+                //System.out.println(data.toString());
+                //data
+            }
+            
+            results = writer.toString();
             
         }
         
